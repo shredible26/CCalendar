@@ -1,0 +1,226 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include "event.h"
+#include "calendar.h"
+#include "my_memory_checker_216.h"
+
+/*****************************************************/
+/* In this file you will provide tests for your      */
+/* calendar application.  Each test should be named  */
+/* test1(), test2(), etc. Each test must have a      */
+/* brief description of what it is testing (this     */
+/* description is important).                        */
+/*                                                   */
+/* You can tell whether any test failed if after     */
+/* executing the students tests, you executed        */
+/* "echo $?" on the command line and you get a value */
+/* other than 0.  "echo $?" prints the status of     */
+/* the last command executed by the shell.           */ 
+/*                                                   */
+/* Notice that main just calls test1(), test2(), etc.*/
+/* and once one fails, the program eventually        */
+/* return EXIT_FAILURE; otherwise EXIT_SUCCESS will  */
+/* be returned.                                      */
+/*****************************************************/
+
+static int comp_minutes(const void *ptr1, const void *ptr2) {
+   return ((Event *)ptr1)->duration_minutes - ((Event *)ptr2)->duration_minutes;
+}
+
+/* Description here: This test checks ...  */
+static int test1() {
+   int days = 7;
+   Calendar *calendar;
+
+   if (init_calendar("Spr", days, comp_minutes, NULL, &calendar) == SUCCESS) {
+      if (print_calendar(calendar, stdout, 1) == SUCCESS) {
+         return destroy_calendar(calendar);
+      }
+   }
+    
+   return FAILURE;
+}
+
+static int test2() {
+    Calendar *calendar;
+    int days = 2, status = FAILURE;
+
+    if (init_calendar("Spr", days, comp_minutes, NULL, &calendar) == SUCCESS) {
+
+        if (add_event(calendar, "day #1 meeting", 500, 60, NULL, 1) == SUCCESS &&
+            add_event(calendar, "day #2 meeting", 500, 60, NULL, 2) == SUCCESS) {
+            status = SUCCESS;
+        }
+        if (destroy_calendar(calendar) == FAILURE) {
+            status = FAILURE;
+        }
+    }
+    return status;
+}
+
+static int test3() {
+    Calendar *calendar;
+    int days = 5, status = FAILURE;
+
+    if (init_calendar("Spr", days, comp_minutes, NULL, &calendar) == SUCCESS) {
+
+        if ((add_event(calendar, "brunch w/ john", 800, 60, NULL, 2) == SUCCESS) &&
+            (add_event(calendar, "blind date", 800, 80, NULL, 2) == SUCCESS) &&
+            (add_event(calendar, "festival", 800, 120, NULL, 4) == SUCCESS) &&
+            (add_event(calendar, "recital", 800, 120, NULL, 5)) == SUCCESS) {
+            status = SUCCESS;
+        }
+        if (destroy_calendar(calendar) == FAILURE) {
+            status = FAILURE;
+        }
+    }
+    return status;
+}
+
+
+static int test4() {
+    Calendar *calendar;
+    int days = 5, status = FAILURE;
+
+    if (init_calendar("Spr", days, comp_minutes, NULL, &calendar) == SUCCESS) {
+        add_event(calendar, "girls night", 800, 60, NULL, 2);
+
+        if (add_event(calendar, "girls night", 800, 80, NULL, 2) == FAILURE &&
+            (add_event(calendar, "girls night", 800, 80, NULL, 5) == FAILURE)) {
+            status = SUCCESS;
+        }
+        if (destroy_calendar(calendar) == FAILURE) {
+            status = FAILURE;
+        }
+    }
+    return status;
+}
+
+static int test5() {
+    Calendar *calendar;
+    Event *event;
+    int days = 5, status = FAILURE;
+
+    if (init_calendar("Spr", days, comp_minutes, NULL, &calendar) == SUCCESS) {
+
+        add_event(calendar, "event 1", 800, 60, NULL, 1);
+        add_event(calendar, "event 2", 800, 60, NULL, 3);
+
+        if (find_event(calendar, "event 1", &event) == SUCCESS &&
+            find_event(calendar, "event 2", &event) == SUCCESS) {
+            status = SUCCESS;
+        }
+        if (destroy_calendar(calendar) == FAILURE) {
+            status = FAILURE;
+        }
+    }
+    return status;
+}
+
+static int test6() {
+    Calendar *calendar;
+    Event *event;
+    int days = 5, status = FAILURE;
+
+    if (init_calendar("Spr", days, comp_minutes, NULL, &calendar) == SUCCESS) {
+
+        add_event(calendar, "event 1", 800, 60, NULL, 1);
+        add_event(calendar, "event 2", 800, 60, NULL, 3);
+
+        if (find_event(calendar, "wrong event", &event) == FAILURE &&
+            find_event(calendar, "upside down dog", &event) == FAILURE) {
+            status = SUCCESS;
+        }
+        if (destroy_calendar(calendar) == FAILURE) {
+            status = FAILURE;
+        }
+    }
+    return status;
+}
+
+
+static int test13() {
+    Calendar *calendar;
+    int days = 5, status = FAILURE;
+
+    if (init_calendar("Spr", days, comp_minutes, NULL, &calendar) == SUCCESS) {
+
+        /* these won't clear anything but should return success */
+        if (clear_calendar(calendar) == SUCCESS &&
+            clear_day(calendar, 1) && clear_day(calendar, 4)) {
+            status = SUCCESS;
+        }
+        if (destroy_calendar(calendar) == FAILURE) {
+            status = FAILURE;
+        }
+    }
+    return status;
+}
+
+int main() {
+   int result = SUCCESS;
+
+   /***** Starting memory checking *****/
+   start_memory_check();
+   /***** Starting memory checking *****/
+
+   printf("Running student test 1...\n");
+   if (test1() == FAILURE) {
+      printf("You failed student test 1.\n");
+      result = FAILURE;
+   }
+   else printf("You passed student test 1!\n");
+
+   printf("Running student test 2...\n");
+   if (test2() == FAILURE) {
+      printf("You failed student test 2.\n");
+      result = FAILURE;
+   }
+   else printf("You passed student test 2!\n");
+
+   printf("Running student test 3...\n");
+   if (test3() == FAILURE) {
+      printf("You failed student test 3.\n");
+      result = FAILURE;
+   }
+   else printf("You passed student test 3!\n");
+
+   printf("Running student test 4...\n");
+   if (test4() == FAILURE) {
+      printf("You failed student test 4.\n");
+      result = FAILURE;
+   }
+   else printf("You passed student test 4!\n");
+
+   printf("Running student test 5...\n");
+   if (test5() == FAILURE) {
+      printf("You failed student test 5.\n");
+      result = FAILURE;
+   }
+   else printf("You passed student test 5!\n");
+
+   printf("Running student test 6...\n");
+   if (test6() == FAILURE) {
+      printf("You failed student test 6.\n");
+      result = FAILURE;
+   }
+   else printf("You passed student test 6!\n");   
+    
+    printf("Running student test 13...\n");
+    if (test13() == FAILURE) {
+        printf("You failed student test 13.\n");
+        result = FAILURE;
+    }
+    else printf("You passed student test 13!\n");
+
+   /****** Gathering memory checking info *****/
+   stop_memory_check();
+   /****** Gathering memory checking info *****/
+   
+   if (result == FAILURE) {
+      printf("Dude. You didn't pass some tests, check again.\n");
+      exit(EXIT_FAILURE);
+   }
+   printf("Your student tests for project4 were successful!\n");
+   return EXIT_SUCCESS;
+}
